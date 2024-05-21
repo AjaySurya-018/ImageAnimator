@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-# File   : batchnorm.py
-# Author : Jiayuan Mao
-# Email  : maojiayuan@gmail.com
-# Date   : 27/01/2018
-# 
-# This file is part of Synchronized-BatchNorm-PyTorch.
-# https://github.com/vacancy/Synchronized-BatchNorm-PyTorch
-# Distributed under MIT License.
-
+"""
+-Implements synchronized batch normalization layers for 1D, 2D, and 3D inputs.
+-Inherits from _SynchronizedBatchNorm, which extends PyTorch's _BatchNorm.
+-Overrides forward method to handle synchronization logic during training.
+-Computes statistics across all devices during training, ensuring accurate statistics compared
+to PyTorch's built-in implementation when used with nn.DataParallel.
+"""
 import collections
 
 import torch
