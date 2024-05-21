@@ -1,6 +1,7 @@
 from torch import nn
 
 import torch.nn.functional as F
+# provides functional interfaces like activation functions
 import torch
 
 from sync_batchnorm import SynchronizedBatchNorm2d as BatchNorm2d
@@ -9,6 +10,9 @@ from sync_batchnorm import SynchronizedBatchNorm2d as BatchNorm2d
 def kp2gaussian(kp, spatial_size, kp_variance):
     """
     Transform a keypoint into gaussian like representation
+    kp contains keypoint coordinates.
+    spatial_size defines the dimensions of the output grid.
+    kp_variance controls the spread of the Gaussian
     """
     mean = kp['value']
 
@@ -18,6 +22,7 @@ def kp2gaussian(kp, spatial_size, kp_variance):
     coordinate_grid = coordinate_grid.view(*shape)
     repeats = mean.shape[:number_of_leading_dimensions] + (1, 1, 1)
     coordinate_grid = coordinate_grid.repeat(*repeats)
+    # Repeats the grid to match the input dimensions
 
     # Preprocess kp shape
     shape = mean.shape[:number_of_leading_dimensions] + (1, 1, 2)
@@ -37,10 +42,12 @@ def make_coordinate_grid(spatial_size, type):
     h, w = spatial_size
     x = torch.arange(w).type(type)
     y = torch.arange(h).type(type)
-
+   
+    # normalizing the co-ordinates to the range [-1 , 1]
     x = (2 * (x / (w - 1)) - 1)
     y = (2 * (y / (h - 1)) - 1)
-
+   
+    # constructing the meshgrid
     yy = y.view(-1, 1).repeat(1, w)
     xx = x.view(1, -1).repeat(h, 1)
 
@@ -51,7 +58,9 @@ def make_coordinate_grid(spatial_size, type):
 
 class ResBlock2d(nn.Module):
     """
-    Res block, preserve spatial resolution.
+    Residual block, preserve spatial resolution.
+    It consists of 2 convolutional layers followed by batch normalization and RELU activation
+    in_features= number of input channels
     """
 
     def __init__(self, in_features, kernel_size, padding):
@@ -62,7 +71,10 @@ class ResBlock2d(nn.Module):
                                padding=padding)
         self.norm1 = BatchNorm2d(in_features, affine=True)
         self.norm2 = BatchNorm2d(in_features, affine=True)
-
+        
+    # x is the input tensor to the block. 
+    # It has the shape (N, C, H, W), where N is the batch size, C is the number of channels.
+    
     def forward(self, x):
         out = self.norm1(x)
         out = F.relu(out)
@@ -72,11 +84,16 @@ class ResBlock2d(nn.Module):
         out = self.conv2(out)
         out += x
         return out
+#  Adds the original input x to the output of the second convolution. This is the key feature of 
+# residual blocks, allowing the input to bypass the convolutional layers and adding it directly to the output, facilitating gradient flow.
 
 
 class UpBlock2d(nn.Module):
     """
     Upsampling block for use in decoder.
+    This block increases the spatial resolution of the input tensor by a factor of 2 while
+    transforming the number of channels from in_features to out_features.
+    The goal is to reconstruct higher resolution outputs from lower resolution inputs
     """
 
     def __init__(self, in_features, out_features, kernel_size=3, padding=1, groups=1):
@@ -92,11 +109,13 @@ class UpBlock2d(nn.Module):
         out = self.norm(out)
         out = F.relu(out)
         return out
+        # out = (N,L,2H,2W)
 
 
 class DownBlock2d(nn.Module):
     """
     Downsampling block for use in encoder.
+    To reduce the spatial dimension of the input image
     """
 
     def __init__(self, in_features, out_features, kernel_size=3, padding=1, groups=1):
@@ -112,6 +131,7 @@ class DownBlock2d(nn.Module):
         out = F.relu(out)
         out = self.pool(out)
         return out
+        # out=(N, out_features, H/2,w/2)
 
 
 class SameBlock2d(nn.Module):
