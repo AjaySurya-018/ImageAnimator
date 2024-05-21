@@ -1,7 +1,4 @@
-"""
-Code from https://github.com/hassony2/torch_videovision
-"""
-
+""" set of transformations for augmenting video data"""
 import numbers
 
 import random
