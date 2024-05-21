@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-# File   : comm.py
-# Author : Jiayuan Mao
-# Email  : maojiayuan@gmail.com
-# Date   : 27/01/2018
-# 
-# This file is part of Synchronized-BatchNorm-PyTorch.
-# https://github.com/vacancy/Synchronized-BatchNorm-PyTorch
-# Distributed under MIT License.
-
+"""
+- Defines classes for inter-process communication, including FutureResult for thread-safe 
+future implementation and SlavePipe for master-slave communication.
+-SyncMaster is an abstract class representing synchronization between master and slave 
+devices during parallel computation.
+-Provides methods for registering slave devices, running master logic during forward pass, 
+and managing communication between master and slaves.
+"""
 import queue
 import collections
 import threading
