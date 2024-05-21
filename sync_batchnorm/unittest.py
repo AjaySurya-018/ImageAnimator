@@ -1,13 +1,7 @@
-# -*- coding: utf-8 -*-
-# File   : unittest.py
-# Author : Jiayuan Mao
-# Email  : maojiayuan@gmail.com
-# Date   : 27/01/2018
-# 
-# This file is part of Synchronized-BatchNorm-PyTorch.
-# https://github.com/vacancy/Synchronized-BatchNorm-PyTorch
-# Distributed under MIT License.
-
+"""
+This is a custom test case for testing torch tensors.
+This method ensures that two tensors are numerically close to each other.
+"""
 import unittest
 
 import numpy as np
