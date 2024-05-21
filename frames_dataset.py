@@ -10,7 +10,10 @@ import pandas as pd
 from augmentation import AllAugmentationTransform
 import glob
 
-
+"""
+Read video from different formats and convert it into numpyarray format
+- name is path to video or image
+"""
 def read_video(name, frame_shape):
     """
     Read video which can be:
@@ -59,7 +62,12 @@ class FramesDataset(Dataset):
       - '.mp4' or '.gif'
       - folder with all frames
     """
-
+ """
+ Retrieves from the dataset based on index.When retrieving items, it checks if ID sampling is enabled for training, 
+ retrieves the path to the video or frame directory,reads the video frames, 
+ samples frames and applies transformations if in training mode, 
+ and prepares a dictionary containing the video frames and name.
+ """
     def __init__(self, root_dir, frame_shape=(256, 256, 3), id_sampling=False, is_train=True,
                  random_seed=0, pairs_list=None, augmentation_params=None):
         self.root_dir = root_dir
@@ -96,7 +104,12 @@ class FramesDataset(Dataset):
 
     def __len__(self):
         return len(self.videos)
-
+   """
+   Based on the index, retrieves the path to the video or frame directory.
+   Reads the video frames.
+   Samples frames and applies transformations if in training mode.
+   Prepares and returns a dictionary containing the video frames and name.
+   """
     def __getitem__(self, idx):
         if self.is_train and self.id_sampling:
             name = self.videos[idx]
@@ -157,6 +170,9 @@ class DatasetRepeater(Dataset):
 class PairedDataset(Dataset):
     """
     Dataset of pairs for animation.
+    Sets up the initial dataset and retrieves the list of pairs from the initial dataset if available.
+    If no pairs list is provided it generates pairs randomly
+    For each pair, it maps the names of the driving and source videos to their corresponding indices in the dataset
     """
 
     def __init__(self, initial_dataset, number_of_pairs, seed=0):
