@@ -155,6 +155,8 @@ class SameBlock2d(nn.Module):
 class Encoder(nn.Module):
     """
     Hourglass Encoder
+    consists of multiple DownBlock2d layers to progressively reduce the spatial
+    resolution and increase the feature depth
     """
 
     def __init__(self, block_expansion, in_features, num_blocks=3, max_features=256):
@@ -177,6 +179,8 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     """
     Hourglass Decoder
+    Consists of multiple UpBlock2d layers to progressively increase the spatial resolution 
+    and combine features from the encoder via skip connections.
     """
 
     def __init__(self, block_expansion, in_features, num_blocks=3, max_features=256):
@@ -219,6 +223,7 @@ class Hourglass(nn.Module):
 class AntiAliasInterpolation2d(nn.Module):
     """
     Band-limited downsampling, for better preservation of the input signal.
+     Implements a Gaussian filter for downsampling
     """
     def __init__(self, channels, scale):
         super(AntiAliasInterpolation2d, self).__init__()
