@@ -203,7 +203,7 @@ class Decoder(nn.Module):
 
 class Hourglass(nn.Module):
     """
-    Hourglass architecture.
+    Hourglass architecture.Uses a single pipeline with skip layer to preserve spatial information
     """
 
     def __init__(self, block_expansion, in_features, num_blocks=3, max_features=256):
